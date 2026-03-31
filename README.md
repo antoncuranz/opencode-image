@@ -11,8 +11,10 @@ nix build .#packages.x86_64-linux.default
 ## Run with Podman
 
 ```bash
-podman load -i result
-podman tag "$(podman images --format '{{.ID}}' | head -n 1)" localhost/opencode-nixos-web-image:dev
+podman import \
+  --change 'CMD ["/init"]' \
+  result/tarball/*.tar.xz \
+  localhost/opencode-nixos-web-image:dev
 podman run --rm \
   -p 4096:4096 \
   -e OPENCODE_SERVER_PASSWORD=change-me \

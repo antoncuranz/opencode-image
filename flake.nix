@@ -21,10 +21,11 @@
           modules = [
             ./nix/system.nix
             home-manager.nixosModules.home-manager
+            "${nixpkgs}/nixos/modules/virtualisation/docker-image.nix"
           ];
         };
       in {
         nixosConfigurations.opencode-web = nixosConfiguration;
-        packages.default = nixosConfiguration.config.system.build.images.oci;
+        packages.default = nixosConfiguration.config.system.build.tarball;
       });
 }
