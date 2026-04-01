@@ -4,6 +4,7 @@ set -euo pipefail
 runtime="${CONTAINER_CLI:-docker}"
 image="${1:?image required}"
 cid=""
+tools='opencode git gh rg node npm bun python3 go kubectl helm flux talosctl op yq make docker psql pg_dump vim nix chromium'
 
 health_status() {
   curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4096/global/health
@@ -39,7 +40,8 @@ test "$("$runtime" inspect --format '{{.Config.WorkingDir}}' "$cid")" = "/worksp
 "$runtime" exec "$cid" sh -lc 'test "$HOME" = "/home/opencode"'
 "$runtime" exec "$cid" sh -lc 'test "$SSL_CERT_FILE" = "/etc/ssl/certs/ca-bundle.crt"'
 "$runtime" exec "$cid" sh -lc 'test -f "$SSL_CERT_FILE"'
-"$runtime" exec "$cid" sh -lc 'command -v opencode git gh rg'
+"$runtime" exec "$cid" sh -lc "command -v $tools"
+"$runtime" exec "$cid" sh -lc 'chromium --version >/dev/null'
 "$runtime" exec "$cid" sh -lc '! command -v ssh >/dev/null 2>&1'
 "$runtime" exec "$cid" sh -lc 'git config --global --get credential.helper | grep "gh auth git-credential"'
 "$runtime" exec "$cid" sh -lc 'test "$(gh config get git_protocol)" = "https"'
