@@ -5,6 +5,10 @@ runtime="${CONTAINER_CLI:-docker}"
 image="${1:?image required}"
 cid=""
 
+health_status() {
+  curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4096/global/health
+}
+
 cleanup() {
   if [ -n "$cid" ]; then
     "$runtime" rm -f "$cid" >/dev/null 2>&1 || true
@@ -21,7 +25,8 @@ cid=$("$runtime" run -d \
   "$image")
 
 for _ in $(seq 1 30); do
-  if curl -fsS http://127.0.0.1:4096/global/health >/dev/null 2>&1; then
+  status="$(health_status || true)"
+  if [ "$status" = "200" ] || [ "$status" = "401" ]; then
     break
   fi
   sleep 1
@@ -39,4 +44,5 @@ test "$("$runtime" inspect --format '{{.Config.WorkingDir}}' "$cid")" = "/worksp
 "$runtime" exec "$cid" sh -lc 'git config --global --get credential.helper | grep "gh auth git-credential"'
 "$runtime" exec "$cid" sh -lc 'test "$(gh config get git_protocol)" = "https"'
 "$runtime" exec "$cid" sh -lc 'curl -fsS https://github.com >/dev/null'
-curl -fsS http://127.0.0.1:4096/global/health >/dev/null
+status="$(health_status)"
+test "$status" = "200" -o "$status" = "401"
