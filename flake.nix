@@ -1,5 +1,5 @@
 {
-  description = "Rootless NixOS OCI image for OpenCode web";
+  description = "Standard OCI image for OpenCode web";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/release-25.11";
@@ -11,21 +11,69 @@
     opencode-config.url = "github:antoncuranz/opencode-config";
   };
 
-  outputs = inputs@{ self, nixpkgs, flake-utils, home-manager, ... }:
+  outputs = inputs@{ nixpkgs, flake-utils, ... }:
     flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" ] (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        nixosConfiguration = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = { inherit inputs; };
-          modules = [
-            ./nix/system.nix
-            home-manager.nixosModules.home-manager
-            "${nixpkgs}/nixos/modules/virtualisation/docker-image.nix"
+        entrypoint = pkgs.writeShellApplication {
+          name = "opencode-entrypoint";
+          runtimeInputs = with pkgs; [ coreutils opencode ];
+          text = builtins.readFile ./scripts/entrypoint.sh;
+        };
+        configRoot = import ./nix/render-config.nix {
+          inherit inputs pkgs;
+        };
+        runtimeRoot = pkgs.runCommand "opencode-runtime-root" {} ''
+          mkdir -p "$out/etc" "$out/home/opencode" "$out/workspace"
+          cat > "$out/etc/passwd" <<'EOF'
+          root:x:0:0:root:/root:/bin/bash
+          opencode:x:1000:1000:OpenCode:/home/opencode:/bin/bash
+          EOF
+          cat > "$out/etc/group" <<'EOF'
+          root:x:0:
+          opencode:x:1000:
+          EOF
+        '';
+        image = pkgs.dockerTools.buildLayeredImage {
+          name = "opencode-image";
+          tag = "latest";
+          contents = with pkgs; [
+            bash
+            cacert
+            coreutils
+            curl
+            git
+            gh
+            gnugrep
+            jq
+            less
+            procps
+            ripgrep
+            opencode
+            entrypoint
+            configRoot
+            runtimeRoot
           ];
+          fakeRootCommands = ''
+            chown -R 1000:1000 home/opencode workspace
+          '';
+          config = {
+            Entrypoint = [ "/bin/opencode-entrypoint" ];
+            Env = [
+              "HOME=/home/opencode"
+              "PORT=4096"
+            ];
+            User = "1000:1000";
+            WorkingDir = "/workspace";
+          };
         };
       in {
-        nixosConfigurations.opencode-web = nixosConfiguration;
-        packages.default = nixosConfiguration.config.system.build.tarball;
+        packages.default = image;
+        packages.oci-image = image;
+
+        checks.smoke-script = pkgs.runCommand "smoke-script" {} ''
+          test -x ${./scripts/smoke.sh}
+          touch "$out"
+        '';
       });
 }

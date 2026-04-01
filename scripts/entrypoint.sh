@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mkdir -p /workspace "$HOME"
+export HOME="${HOME:-/home/opencode}"
+export PORT="${PORT:-4096}"
 
-exec opencode web --hostname 0.0.0.0 --port "$PORT"
+mkdir -p /workspace "$HOME"
+cd /workspace
+
+exec opencode web --hostname 0.0.0.0 --port "${PORT}"
