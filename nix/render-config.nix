@@ -1,4 +1,4 @@
-{ inputs, pkgs }:
+{ inputs, pkgs, opencodePkg }:
 
 let
   home = inputs.home-manager.lib.homeManagerConfiguration {
@@ -6,6 +6,9 @@ let
     modules = [
       inputs.opencode-config.homeManagerModules.default
       ./home.nix
+      {
+        programs.opencode.package = opencodePkg;
+      }
     ];
   };
 in

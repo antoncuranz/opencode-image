@@ -32,8 +32,11 @@ test "$("$runtime" inspect --format '{{.Config.WorkingDir}}' "$cid")" = "/worksp
 "$runtime" exec "$cid" sh -lc 'test "$(id -u)" = 1000'
 "$runtime" exec "$cid" sh -lc 'test "$(id -g)" = 1000'
 "$runtime" exec "$cid" sh -lc 'test "$HOME" = "/home/opencode"'
+"$runtime" exec "$cid" sh -lc 'test "$SSL_CERT_FILE" = "/etc/ssl/certs/ca-certificates.crt"'
+"$runtime" exec "$cid" sh -lc 'test -f "$SSL_CERT_FILE"'
 "$runtime" exec "$cid" sh -lc 'command -v opencode git gh rg'
 "$runtime" exec "$cid" sh -lc '! command -v ssh >/dev/null 2>&1'
 "$runtime" exec "$cid" sh -lc 'git config --global --get credential.helper | grep "gh auth git-credential"'
 "$runtime" exec "$cid" sh -lc 'test "$(gh config get git_protocol)" = "https"'
+"$runtime" exec "$cid" sh -lc 'curl -fsS https://github.com >/dev/null'
 curl -fsS http://127.0.0.1:4096/global/health >/dev/null

@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/release-25.11";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
@@ -11,20 +12,23 @@
     opencode-config.url = "github:antoncuranz/opencode-config";
   };
 
-  outputs = inputs@{ nixpkgs, flake-utils, ... }:
+  outputs = inputs@{ nixpkgs, nixpkgs-unstable, flake-utils, ... }:
     flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" ] (system:
       let
         pkgs = import nixpkgs { inherit system; };
+        unstablePkgs = import nixpkgs-unstable { inherit system; };
+        opencodePkg = unstablePkgs.opencode;
         entrypoint = pkgs.writeShellApplication {
           name = "opencode-entrypoint";
-          runtimeInputs = with pkgs; [ coreutils opencode ];
+          runtimeInputs = with pkgs; [ coreutils opencodePkg ];
           text = builtins.readFile ./scripts/entrypoint.sh;
         };
         configRoot = import ./nix/render-config.nix {
           inherit inputs pkgs;
+          opencodePkg = opencodePkg;
         };
         runtimeRoot = pkgs.runCommand "opencode-runtime-root" {} ''
-          mkdir -p "$out/etc" "$out/home/opencode" "$out/workspace"
+          mkdir -p "$out/etc/ssl/certs" "$out/home/opencode" "$out/workspace"
           cat > "$out/etc/passwd" <<'EOF'
           root:x:0:0:root:/root:/bin/bash
           opencode:x:1000:1000:OpenCode:/home/opencode:/bin/bash
@@ -33,6 +37,8 @@
           root:x:0:
           opencode:x:1000:
           EOF
+          ln -s ${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt "$out/etc/ssl/certs/ca-bundle.crt"
+          ln -s ${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt "$out/etc/ssl/certs/ca-certificates.crt"
         '';
         image = pkgs.dockerTools.buildLayeredImage {
           name = "opencode-image";
@@ -49,7 +55,7 @@
             less
             procps
             ripgrep
-            opencode
+            opencodePkg
             entrypoint
             configRoot
             runtimeRoot
@@ -62,6 +68,11 @@
             Env = [
               "HOME=/home/opencode"
               "PORT=4096"
+              "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt"
+              "NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt"
+              "CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt"
+              "GIT_SSL_CAINFO=/etc/ssl/certs/ca-certificates.crt"
+              "NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt"
             ];
             User = "1000:1000";
             WorkingDir = "/workspace";
