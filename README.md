@@ -43,7 +43,7 @@ Runtime contract:
 - entrypoint: `opencode web --hostname 0.0.0.0 --port ${PORT:-4096}`
 - auth: GitHub HTTPS via `gh` credential helper only
 - SSH tooling is intentionally not included
-- CA bundle is exposed at `/etc/ssl/certs/ca-certificates.crt`
+- CA bundle is exposed at `/etc/ssl/certs/ca-bundle.crt`
 
 Config is baked in through `opencode-config` and discovered from `~/.config/opencode`. `OPENCODE_CONFIG_DIR` does not need to be set.
 
