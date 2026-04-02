@@ -94,6 +94,7 @@
             _1password-cli
             procps
             postgresql
+            postgresql.dev
             (python312.withPackages (ps: with ps; [ pip rich ]))
             ripgrep
             runc
