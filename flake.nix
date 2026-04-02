@@ -81,7 +81,7 @@
             libpq.pg_config
             procps
             postgresql
-            (python312.withPackages (ps: with ps; [ pip rich ]))
+            (python312.withPackages (ps: with ps; [ pip pytest rich ]))
             ripgrep
             talosctl
             bun
