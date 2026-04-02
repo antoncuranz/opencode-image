@@ -20,15 +20,16 @@
           config.allowUnfreePredicate = pkg:
             builtins.elem (nixpkgs.lib.getName pkg) [ "1password-cli" ];
         };
+        # renovate: datasource=github-releases depName=anomalyco/opencode
         opencodeVersion = "1.3.13";
         opencodeReleases = {
           x86_64-linux = {
-            artifact = "opencode-linux-x64.tar.gz";
-            hash = "sha256-CKwqkdjwcbDlu37AhmXH+US8ugCm/gK7ZjONdK0GesU=";
+            artifact = "opencode-linux-x64-musl.tar.gz";
+            hash = "sha256-gTbPRPnIRJ3Gsdf0Acx4eLFFtr9cGOsEY0wJz/2pLcs=";
           };
           aarch64-linux = {
-            artifact = "opencode-linux-arm64.tar.gz";
-            hash = "sha256-r5EzzrXZlXJl1zBFZVSqfDiqvI/zgnOUoj0/6sj+fvI=";
+            artifact = "opencode-linux-arm64-musl.tar.gz";
+            hash = "sha256-Sc4A51uQnQMdks00sRtZvYOtrJSPm/x1tbLStjOzl/w=";
           };
         };
         opencodeRelease = opencodeReleases.${system};

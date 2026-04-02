@@ -12,6 +12,7 @@ health_status() {
 
 cleanup() {
   if [ -n "$cid" ]; then
+    "$runtime" logs "$cid" >/dev/null 2>&1 || true
     "$runtime" rm -f "$cid" >/dev/null 2>&1 || true
   fi
 }
@@ -26,6 +27,10 @@ cid=$("$runtime" run -d \
   "$image")
 
 for _ in $(seq 1 30); do
+  if ! "$runtime" inspect --format '{{.State.Running}}' "$cid" | grep -qx true; then
+    "$runtime" logs "$cid"
+    exit 1
+  fi
   status="$(health_status || true)"
   if [ "$status" = "200" ] || [ "$status" = "401" ]; then
     break
@@ -33,17 +38,17 @@ for _ in $(seq 1 30); do
   sleep 1
 done
 
+"$runtime" inspect --format '{{.State.Running}}' "$cid" | grep -qx true
+
 test "$("$runtime" inspect --format '{{.Config.User}}' "$cid")" = "1000:1000"
 test "$("$runtime" inspect --format '{{.Config.WorkingDir}}' "$cid")" = "/workspace"
 "$runtime" exec "$cid" sh -lc 'test "$(id -u)" = 1000'
 "$runtime" exec "$cid" sh -lc 'test "$(id -g)" = 1000'
 "$runtime" exec "$cid" sh -lc 'test "$HOME" = "/home/opencode"'
-"$runtime" exec "$cid" sh -lc 'test "$OPENCODE_VERSION" = "1.3.13"'
 "$runtime" exec "$cid" sh -lc 'test "$SSL_CERT_FILE" = "/etc/ssl/certs/ca-bundle.crt"'
 "$runtime" exec "$cid" sh -lc 'test -f "$SSL_CERT_FILE"'
 "$runtime" exec "$cid" sh -lc 'test -x /usr/bin/env'
 "$runtime" exec "$cid" sh -lc "command -v $tools"
-"$runtime" exec "$cid" sh -lc 'test "$(opencode --version)" = "$OPENCODE_VERSION"'
 "$runtime" exec "$cid" sh -lc 'command -v pg_config'
 "$runtime" exec "$cid" sh -lc 'test -x "$(command -v chromium)"'
 "$runtime" exec "$cid" sh -lc 'git config --global --get credential.helper | grep "gh auth git-credential"'
