@@ -1,6 +1,6 @@
 # opencode-image
 
-Standard OCI image for running `opencode web` with `opencode-config` baked in.
+Standard OCI image for running `opencode web` with `opencode-config` baked in and a broader daily-driver toolchain for local repo work.
 
 ## Build
 
@@ -29,6 +29,10 @@ Required mounts:
 
 - `/workspace` for working repos
 
+Optional mounts:
+
+- `/var/run/docker.sock:/var/run/docker.sock` if you want `docker`, Testcontainers, or image builds from inside the container
+
 Required env:
 
 - `OPENCODE_SERVER_PASSWORD`
@@ -45,7 +49,18 @@ Runtime contract:
 - SSH tooling is intentionally not included
 - CA bundle is exposed at `/etc/ssl/certs/ca-bundle.crt`
 
+Included tooling baseline:
+
+- JS: `node`, `npm`, `bun`
+- Python: `python3`, `pip`
+- Go: `go`
+- Kubernetes/GitOps: `kubectl`, `helm`, `flux`, `talosctl`, `op`, `yq`
+- Dev tooling: `make`, `docker`, `psql`, `pg_dump`, `vim`, `nix`
+- Browser automation baseline: `chromium` for `agent-browser` and similar tooling
+
 Config is baked in through `opencode-config` and discovered from `~/.config/opencode`. `OPENCODE_CONFIG_DIR` does not need to be set.
+
+The image stays HTTPS-only for Git auth. SSH-based flows, including `cloudlab` bootstrap paths that expect SSH remotes, remain out of scope for this image.
 
 ## Smoke test
 
@@ -65,6 +80,8 @@ Published tags:
 
 ## Troubleshooting
 
+- If `docker` is installed but cannot reach the daemon, mount the host Docker socket or use a remote daemon.
+- If browser automation fails, verify `chromium` starts inside the container and that your OpenCode browser tooling is configured to use it.
 - If GitHub auth fails, verify `GH_TOKEN` is present and `git config --global --get credential.helper` contains `gh auth git-credential`.
 - If the web UI is reachable but login fails, verify `OPENCODE_SERVER_PASSWORD` matches the credentials used by the client.
 - If the container cannot write the mounted workspace, fix host ownership for UID `1000`.

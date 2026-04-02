@@ -18,8 +18,16 @@
   outputs = inputs@{ nixpkgs, flake-utils, opencode, ... }:
     flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" ] (system:
       let
-        pkgs = import nixpkgs { inherit system; };
+        nixpkgsConfig = {
+          inherit system;
+          config.allowUnfreePredicate = pkg:
+            builtins.elem (nixpkgs.lib.getName pkg) [ "1password-cli" ];
+        };
+        pkgs = import nixpkgs nixpkgsConfig;
         opencodePkg = opencode.packages.${system}.default;
+        bunPkg = pkgs.bun;
+        goPkg = pkgs.go;
+        pythonPkg = pkgs.python312.withPackages (ps: with ps; [ pip rich ]);
         entrypoint = pkgs.writeShellApplication {
           name = "opencode-entrypoint";
           runtimeInputs = with pkgs; [ coreutils opencodePkg ];
@@ -47,15 +55,32 @@
           contents = with pkgs; [
             bash
             cacert
+            chromium
             coreutils
             curl
+            docker-client
+            fluxcd
             git
             gh
             gnugrep
+            gnumake
+            goPkg
+            helm
             jq
+            kubectl
             less
+            nix
+            nodejs_24
+            noto-fonts
+            _1password-cli
             procps
+            postgresql
+            pythonPkg
             ripgrep
+            talosctl
+            bunPkg
+            vim
+            yq
             opencodePkg
             entrypoint
             configRoot
