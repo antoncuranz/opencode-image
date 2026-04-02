@@ -29,10 +29,6 @@ Required mounts:
 
 - `/workspace` for working repos
 
-Optional mounts:
-
-- `/var/run/docker.sock:/var/run/docker.sock` if you want `docker`, Testcontainers, or image builds from inside the container
-
 Required env:
 
 - `OPENCODE_SERVER_PASSWORD`
@@ -46,8 +42,11 @@ Runtime contract:
 - `opencode`: `nixpkgs-unstable`
 - entrypoint: `opencode web --hostname 0.0.0.0 --port ${PORT:-4096}`
 - auth: GitHub HTTPS via `gh` credential helper only
-- SSH tooling is intentionally not included
+- SSH-based Git auth is not configured or supported
 - CA bundle is exposed at `/etc/ssl/certs/ca-bundle.crt`
+- `/usr/bin/env` is available for shebang compatibility
+- `pg_config` is available for Python packages like `psycopg2`
+- `clear` and `which` are installed for terminal compatibility
 
 Included tooling baseline:
 
@@ -55,12 +54,12 @@ Included tooling baseline:
 - Python: `python3`, `pip`
 - Go: `go`
 - Kubernetes/GitOps: `kubectl`, `helm`, `flux`, `talosctl`, `op`, `yq`
-- Dev tooling: `make`, `docker`, `psql`, `pg_dump`, `vim`, `nix`
+- Dev tooling: `make`, `psql`, `pg_dump`, `vim`, `nix`, `clear`, `which`
 - Browser automation baseline: `chromium` for `agent-browser` and similar tooling
 
 Config is baked in through `opencode-config` and discovered from `~/.config/opencode`. `OPENCODE_CONFIG_DIR` does not need to be set.
 
-The image stays HTTPS-only for Git auth. SSH-based flows, including `cloudlab` bootstrap paths that expect SSH remotes, remain out of scope for this image.
+The image stays HTTPS-only for Git auth. SSH-based flows, including `cloudlab` bootstrap paths that expect SSH remotes, remain out of scope for this image even if some transitive package ships an `ssh` binary.
 
 ## Smoke test
 
@@ -80,8 +79,9 @@ Published tags:
 
 ## Troubleshooting
 
-- If `docker` is installed but cannot reach the daemon, mount the host Docker socket or use a remote daemon.
-- If browser automation fails, verify `chromium` starts inside the container and that your OpenCode browser tooling is configured to use it.
+- If `psycopg2` fails to build, verify `pg_config` is present with `command -v pg_config`.
+- If a script fails on `#!/usr/bin/env ...`, verify `/usr/bin/env` exists in the container.
+- If browser automation fails, verify the `chromium` wrapper exists in the container and that your OpenCode browser tooling passes the flags your runtime needs.
 - If GitHub auth fails, verify `GH_TOKEN` is present and `git config --global --get credential.helper` contains `gh auth git-credential`.
 - If the web UI is reachable but login fails, verify `OPENCODE_SERVER_PASSWORD` matches the credentials used by the client.
 - If the container cannot write the mounted workspace, fix host ownership for UID `1000`.

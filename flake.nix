@@ -46,7 +46,7 @@
           opencodePkg = opencodePkg;
         };
         runtimeRoot = pkgs.runCommand "opencode-runtime-root" {} ''
-          mkdir -p "$out/etc/ssl/certs" "$out/home/opencode" "$out/workspace"
+          mkdir -p "$out/etc/ssl/certs" "$out/home/opencode" "$out/usr/bin" "$out/workspace"
           cat > "$out/etc/passwd" <<'EOF'
           root:x:0:0:root:/root:/bin/bash
           opencode:x:1000:1000:OpenCode:/home/opencode:/bin/bash
@@ -56,6 +56,7 @@
           opencode:x:1000:
           EOF
           ln -s ${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt "$out/etc/ssl/certs/ca-bundle.crt"
+          ln -s ${pkgs.coreutils}/bin/env "$out/usr/bin/env"
         '';
         image = pkgs.dockerTools.buildLayeredImage {
           name = "opencode-image";
@@ -66,7 +67,6 @@
             chromium
             coreutils
             curl
-            docker-client
             fluxcd
             git
             gh
@@ -78,9 +78,11 @@
             kubectl
             less
             nix
+            ncurses
             nodejs_24
             noto-fonts
             _1password-cli
+            libpq.pg_config
             procps
             postgresql
             (python312.withPackages (ps: with ps; [ pip rich ]))
@@ -88,6 +90,7 @@
             talosctl
             bun
             vim
+            which
             yq
             opencodePkg
             entrypoint
