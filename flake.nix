@@ -19,15 +19,9 @@
   outputs = inputs@{ nixpkgs, nixpkgs-unstable, flake-utils, opencode, ... }:
     flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" ] (system:
       let
-        nixpkgsConfig = {
-          inherit system;
-          config.allowUnfreePredicate = pkg:
-            builtins.elem (nixpkgs.lib.getName pkg) [ "1password-cli" ];
-        };
-        unstablePkgs = import nixpkgs-unstable nixpkgsConfig;
+        unstablePkgs = import nixpkgs-unstable { inherit system; };
         pkgs = import nixpkgs {
           inherit system;
-          config = nixpkgsConfig.config;
           overlays = [
             (final: _prev: {
               bun = unstablePkgs.bun;
@@ -72,6 +66,7 @@
             gh
             gnugrep
             gnutar
+            gzip
             gnumake
             go
             helm
@@ -83,7 +78,6 @@
             ncurses
             nodejs_24
             noto-fonts
-            _1password-cli
             libpq.pg_config
             procps
             postgresql
