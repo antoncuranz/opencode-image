@@ -44,11 +44,11 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1774991950,
-        "narHash": "sha256-kScKj3qJDIWuN9/6PMmgy5esrTUkYinrO5VvILik/zw=",
+        "lastModified": 1774969509,
+        "narHash": "sha256-LCmfWlT3tlGVj0Q20TKqs5PBwdH3vnNsxJEhqt0wH1o=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "f2d3e04e278422c7379e067e323734f3e8c585a7",
+        "rev": "a7d2aca3f0dd952b01d8ed5c45536b40af3841eb",
         "type": "github"
       },
       "original": {
@@ -106,16 +106,33 @@
         "type": "github"
       }
     },
+    "nixpkgs_3": {
+      "locked": {
+        "lastModified": 1774709303,
+        "narHash": "sha256-D3Q07BbIA2KnTcSXIqqu9P586uWxN74zNoCH3h2ESHg=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "opencode-config": {
       "inputs": {
-        "homeManager": "homeManager"
+        "homeManager": "homeManager",
+        "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1774971569,
-        "narHash": "sha256-xzOCDHEWVdUKkLBd4nqEjinSR3tDl93Dkb6VpZu4pv8=",
+        "lastModified": 1775115933,
+        "narHash": "sha256-Q6haoKQA64/3pjFbNWaJBvQg+nAVE0j8fGefex3TkOY=",
         "owner": "antoncuranz",
         "repo": "opencode-config",
-        "rev": "26ef7de64de135d4ded54225184ffcb68c6be007",
+        "rev": "b3189ed1a18249cea974cdf108ce262ce1001528",
         "type": "github"
       },
       "original": {
