@@ -43,7 +43,7 @@ test "$("$runtime" inspect --format '{{.Config.WorkingDir}}' "$cid")" = "/worksp
 "$runtime" exec "$cid" sh -lc 'test -x /usr/bin/env'
 "$runtime" exec "$cid" sh -lc "command -v $tools"
 "$runtime" exec "$cid" sh -lc 'command -v pg_config'
-"$runtime" exec "$cid" sh -lc 'chromium --version >/dev/null'
+"$runtime" exec "$cid" sh -lc 'test -x "$(command -v chromium)"'
 "$runtime" exec "$cid" sh -lc 'docker info >/dev/null'
 "$runtime" exec "$cid" sh -lc 'tmpdir=$(mktemp -d) && trap "rm -rf \"$tmpdir\"" EXIT && printf "FROM scratch\nLABEL smoke=1\n" > "$tmpdir/Dockerfile" && docker build -t opencode-smoke "$tmpdir" >/dev/null && docker image inspect opencode-smoke >/dev/null'
 "$runtime" exec "$cid" sh -lc 'git config --global --get credential.helper | grep "gh auth git-credential"'

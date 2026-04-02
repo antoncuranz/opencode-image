@@ -84,7 +84,7 @@ Published tags:
 - If `docker` is installed but cannot reach the daemon, verify the container is running with `--privileged` or equivalent nested-container support.
 - If `psycopg2` fails to build, verify `pg_config` is present with `command -v pg_config`.
 - If a script fails on `#!/usr/bin/env ...`, verify `/usr/bin/env` exists in the container.
-- If browser automation fails, verify `chromium` starts inside the container and that your OpenCode browser tooling is configured to use it.
+- If browser automation fails, verify the `chromium` wrapper exists in the container and that your OpenCode browser tooling passes the flags your runtime needs.
 - If GitHub auth fails, verify `GH_TOKEN` is present and `git config --global --get credential.helper` contains `gh auth git-credential`.
 - If the web UI is reachable but login fails, verify `OPENCODE_SERVER_PASSWORD` matches the credentials used by the client.
 - If the container cannot write the mounted workspace, fix host ownership for UID `1000`.
