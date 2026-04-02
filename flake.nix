@@ -9,14 +9,10 @@
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    opencode = {
-      url = "github:anomalyco/opencode";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     opencode-config.url = "github:antoncuranz/opencode-config";
   };
 
-  outputs = inputs@{ nixpkgs, nixpkgs-unstable, flake-utils, opencode, ... }:
+  outputs = inputs@{ nixpkgs, nixpkgs-unstable, flake-utils, ... }:
     flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" ] (system:
       let
         nixpkgsConfig = {
@@ -24,6 +20,18 @@
           config.allowUnfreePredicate = pkg:
             builtins.elem (nixpkgs.lib.getName pkg) [ "1password-cli" ];
         };
+        opencodeVersion = "1.3.13";
+        opencodeReleases = {
+          x86_64-linux = {
+            artifact = "opencode-linux-x64.tar.gz";
+            hash = "sha256-CKwqkdjwcbDlu37AhmXH+US8ugCm/gK7ZjONdK0GesU=";
+          };
+          aarch64-linux = {
+            artifact = "opencode-linux-arm64.tar.gz";
+            hash = "sha256-r5EzzrXZlXJl1zBFZVSqfDiqvI/zgnOUoj0/6sj+fvI=";
+          };
+        };
+        opencodeRelease = opencodeReleases.${system};
         unstablePkgs = import nixpkgs-unstable nixpkgsConfig;
         pkgs = import nixpkgs {
           inherit system;
@@ -32,10 +40,31 @@
             (final: _prev: {
               bun = unstablePkgs.bun;
             })
-            opencode.overlays.default
           ];
         };
-        opencodePkg = pkgs.opencode;
+        opencodePkg = pkgs.stdenvNoCC.mkDerivation {
+          pname = "opencode";
+          version = opencodeVersion;
+
+          src = pkgs.fetchurl {
+            url = "https://github.com/anomalyco/opencode/releases/download/v${opencodeVersion}/${opencodeRelease.artifact}";
+            hash = opencodeRelease.hash;
+          };
+
+          dontUnpack = true;
+          nativeBuildInputs = with pkgs; [ autoPatchelfHook gnutar ];
+          buildInputs = with pkgs; [ stdenv.cc.cc.lib ];
+
+          installPhase = ''
+            runHook preInstall
+
+            mkdir -p "$out/bin"
+            tar -xzf "$src" -C "$TMPDIR"
+            install -m755 "$TMPDIR/opencode" "$out/bin/opencode"
+
+            runHook postInstall
+          '';
+        };
         entrypoint = pkgs.writeShellApplication {
           name = "opencode-entrypoint";
           runtimeInputs = with pkgs; [ coreutils opencodePkg ];
@@ -109,6 +138,7 @@
             Env = [
               "HOME=/home/opencode"
               "PORT=4096"
+              "OPENCODE_VERSION=${opencodePkg.version}"
               "SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt"
               "NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt"
               "CURL_CA_BUNDLE=/etc/ssl/certs/ca-bundle.crt"

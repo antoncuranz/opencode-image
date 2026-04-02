@@ -39,7 +39,7 @@ Runtime contract:
 - user: `1000:1000`
 - workdir: `/workspace`
 - home: `/home/opencode`
-- `opencode`: `nixpkgs-unstable`
+- `opencode`: pinned GitHub release binary (`1.3.13`)
 - entrypoint: `opencode web --hostname 0.0.0.0 --port ${PORT:-4096}`
 - auth: GitHub HTTPS via `gh` credential helper only
 - SSH-based Git auth is not configured or supported
@@ -57,7 +57,7 @@ Included tooling baseline:
 - Dev tooling: `make`, `psql`, `pg_dump`, `vim`, `nix`, `clear`, `which`, `tar`, `wget`, `unzip`, `ping`
 - Browser automation baseline: `chromium` for `agent-browser` and similar tooling
 
-Config is baked in through `opencode-config` and discovered from `~/.config/opencode`. `OPENCODE_CONFIG_DIR` does not need to be set.
+Config is baked in through `opencode-config` and discovered from `~/.config/opencode`. `OPENCODE_CONFIG_DIR` does not need to be set. The `opencode` executable is fetched from upstream GitHub releases instead of the OpenCode Nix flake.
 
 The image stays HTTPS-only for Git auth. SSH-based flows, including `cloudlab` bootstrap paths that expect SSH remotes, remain out of scope for this image even if some transitive package ships an `ssh` binary.
 
