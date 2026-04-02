@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/release-25.11";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
@@ -15,7 +16,7 @@
     opencode-config.url = "github:antoncuranz/opencode-config";
   };
 
-  outputs = inputs@{ nixpkgs, flake-utils, opencode, ... }:
+  outputs = inputs@{ nixpkgs, nixpkgs-unstable, flake-utils, opencode, ... }:
     flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" ] (system:
       let
         nixpkgsConfig = {
@@ -24,6 +25,7 @@
             builtins.elem (nixpkgs.lib.getName pkg) [ "1password-cli" ];
         };
         pkgs = import nixpkgs nixpkgsConfig;
+        unstablePkgs = import nixpkgs-unstable nixpkgsConfig;
         opencodePkg = opencode.packages.${system}.default;
         entrypoint = pkgs.writeShellApplication {
           name = "opencode-entrypoint";
@@ -75,7 +77,7 @@
             (python312.withPackages (ps: with ps; [ pip rich ]))
             ripgrep
             talosctl
-            bun
+            unstablePkgs.bun
             vim
             yq
             opencodePkg
