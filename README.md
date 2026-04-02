@@ -54,7 +54,7 @@ Included tooling baseline:
 - Python: `python3`, `pip`
 - Go: `go`
 - Kubernetes/GitOps: `kubectl`, `helm`, `flux`, `talosctl`, `op`, `yq`
-- Dev tooling: `make`, `psql`, `pg_dump`, `vim`, `nix`, `clear`, `which`, `tar`, `wget`, `unzip`, `ping`
+- Dev tooling: `make`, `psql`, `pg_dump`, `vim`, `nix`, `clear`, `which`, `tar`, `gzip`, `wget`, `unzip`, `ping`
 - Browser automation baseline: `chromium` for `agent-browser` and similar tooling
 
 Config is baked in through `opencode-config` and discovered from `~/.config/opencode`. `OPENCODE_CONFIG_DIR` does not need to be set. The `opencode` executable is fetched from upstream GitHub releases instead of the OpenCode Nix flake.

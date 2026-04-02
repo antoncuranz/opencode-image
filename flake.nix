@@ -100,6 +100,7 @@
             git
             gh
             gnugrep
+            gzip
             gnutar
             gnumake
             go
