@@ -18,7 +18,6 @@ Use the override locally to reuse the checked-out `opencode-config` repo. CI kee
 docker load < result
 docker tag opencode-image:latest localhost/opencode-image:dev
 docker run --rm \
-  --privileged \
   -p 4096:4096 \
   -e OPENCODE_SERVER_PASSWORD=change-me \
   -e GH_TOKEN=ghp_example_token \
@@ -47,8 +46,7 @@ Runtime contract:
 - CA bundle is exposed at `/etc/ssl/certs/ca-bundle.crt`
 - `/usr/bin/env` is available for shebang compatibility
 - `pg_config` is available for Python packages like `psycopg2`
-- Docker commands talk to an internal rootless daemon, not a host socket
-- container runtime should grant `--privileged` or equivalent support for nested containers
+- `clear` and `which` are installed for terminal compatibility
 
 Included tooling baseline:
 
@@ -56,7 +54,7 @@ Included tooling baseline:
 - Python: `python3`, `pip`
 - Go: `go`
 - Kubernetes/GitOps: `kubectl`, `helm`, `flux`, `talosctl`, `op`, `yq`
-- Dev tooling: `make`, `docker`, `psql`, `pg_dump`, `vim`, `nix`
+- Dev tooling: `make`, `psql`, `pg_dump`, `vim`, `nix`, `clear`, `which`
 - Browser automation baseline: `chromium` for `agent-browser` and similar tooling
 
 Config is baked in through `opencode-config` and discovered from `~/.config/opencode`. `OPENCODE_CONFIG_DIR` does not need to be set.
@@ -66,7 +64,7 @@ The image stays HTTPS-only for Git auth. SSH-based flows, including `cloudlab` b
 ## Smoke test
 
 ```bash
-CONTAINER_RUN_ARGS=--privileged ./scripts/smoke.sh localhost/opencode-image:dev
+./scripts/smoke.sh localhost/opencode-image:dev
 ```
 
 ## Publish
@@ -81,7 +79,6 @@ Published tags:
 
 ## Troubleshooting
 
-- If `docker` is installed but cannot reach the daemon, verify the container is running with `--privileged` or equivalent nested-container support.
 - If `psycopg2` fails to build, verify `pg_config` is present with `command -v pg_config`.
 - If a script fails on `#!/usr/bin/env ...`, verify `/usr/bin/env` exists in the container.
 - If browser automation fails, verify the `chromium` wrapper exists in the container and that your OpenCode browser tooling passes the flags your runtime needs.

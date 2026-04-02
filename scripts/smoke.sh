@@ -4,12 +4,7 @@ set -euo pipefail
 runtime="${CONTAINER_CLI:-docker}"
 image="${1:?image required}"
 cid=""
-tools='opencode git gh rg node npm bun python3 go kubectl helm flux talosctl op yq make docker psql pg_dump vim nix chromium'
-run_args=()
-
-if [ -n "${CONTAINER_RUN_ARGS:-}" ]; then
-  read -r -a run_args <<< "$CONTAINER_RUN_ARGS"
-fi
+tools='opencode git gh rg node npm bun python3 go kubectl helm flux talosctl op yq make psql pg_dump vim nix chromium clear which'
 
 health_status() {
   curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4096/global/health
@@ -24,7 +19,6 @@ cleanup() {
 trap cleanup EXIT
 
 cid=$("$runtime" run -d \
-  "${run_args[@]}" \
   -p 4096:4096 \
   -e OPENCODE_SERVER_PASSWORD=test \
   -e GH_TOKEN=ghp_example_token \
@@ -50,8 +44,6 @@ test "$("$runtime" inspect --format '{{.Config.WorkingDir}}' "$cid")" = "/worksp
 "$runtime" exec "$cid" sh -lc "command -v $tools"
 "$runtime" exec "$cid" sh -lc 'command -v pg_config'
 "$runtime" exec "$cid" sh -lc 'test -x "$(command -v chromium)"'
-"$runtime" exec "$cid" sh -lc 'docker info >/dev/null'
-"$runtime" exec "$cid" sh -lc 'tmpdir=$(mktemp -d) && trap "rm -rf \"$tmpdir\"" EXIT && printf "FROM scratch\nLABEL smoke=1\n" > "$tmpdir/Dockerfile" && docker build -t opencode-smoke "$tmpdir" >/dev/null && docker image inspect opencode-smoke >/dev/null'
 "$runtime" exec "$cid" sh -lc 'git config --global --get credential.helper | grep "gh auth git-credential"'
 "$runtime" exec "$cid" sh -lc 'test "$(gh config get git_protocol)" = "https"'
 "$runtime" exec "$cid" sh -lc 'curl -fsS https://github.com >/dev/null'

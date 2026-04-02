@@ -55,12 +55,6 @@
           root:x:0:
           opencode:x:1000:
           EOF
-          cat > "$out/etc/subuid" <<'EOF'
-          opencode:100000:65536
-          EOF
-          cat > "$out/etc/subgid" <<'EOF'
-          opencode:100000:65536
-          EOF
           ln -s ${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt "$out/etc/ssl/certs/ca-bundle.crt"
           ln -s ${pkgs.coreutils}/bin/env "$out/usr/bin/env"
         '';
@@ -71,11 +65,8 @@
             bash
             cacert
             chromium
-            containerd
             coreutils
             curl
-            docker
-            docker-client
             fluxcd
             git
             gh
@@ -83,12 +74,11 @@
             gnumake
             go
             helm
-            iproute2
-            iptables
             jq
             kubectl
             less
             nix
+            ncurses
             nodejs_24
             noto-fonts
             _1password-cli
@@ -97,11 +87,10 @@
             postgresql
             (python312.withPackages (ps: with ps; [ pip rich ]))
             ripgrep
-            runc
-            shadow
             talosctl
             bun
             vim
+            which
             yq
             opencodePkg
             entrypoint
@@ -132,10 +121,6 @@
 
         checks.smoke-script = pkgs.runCommand "smoke-script" {} ''
           test -x ${./scripts/smoke.sh}
-          touch "$out"
-        '';
-        checks.smoke-script-run-args = pkgs.runCommand "smoke-script-run-args" {} ''
-          ${pkgs.bash}/bin/bash ${./scripts/test-smoke.sh}
           touch "$out"
         '';
       });
