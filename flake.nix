@@ -133,5 +133,9 @@
           test -x ${./scripts/smoke.sh}
           touch "$out"
         '';
+        checks.smoke-script-run-args = pkgs.runCommand "smoke-script-run-args" {} ''
+          ${pkgs.bash}/bin/bash ${./scripts/test-smoke.sh}
+          touch "$out"
+        '';
       });
 }

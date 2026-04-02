@@ -66,7 +66,7 @@ The image stays HTTPS-only for Git auth. SSH-based flows, including `cloudlab` b
 ## Smoke test
 
 ```bash
-./scripts/smoke.sh localhost/opencode-image:dev
+CONTAINER_RUN_ARGS=--privileged ./scripts/smoke.sh localhost/opencode-image:dev
 ```
 
 ## Publish

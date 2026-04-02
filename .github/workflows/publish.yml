@@ -31,7 +31,7 @@ jobs:
           docker tag opencode-image:latest "$IMAGE_REF"
 
       - name: Smoke test image
-        run: ./scripts/smoke.sh opencode-image:latest
+        run: CONTAINER_RUN_ARGS=--privileged ./scripts/smoke.sh opencode-image:latest
 
       - name: Login to GHCR
         if: github.event_name != 'pull_request'

@@ -5,6 +5,11 @@ runtime="${CONTAINER_CLI:-docker}"
 image="${1:?image required}"
 cid=""
 tools='opencode git gh rg node npm bun python3 go kubectl helm flux talosctl op yq make docker psql pg_dump vim nix chromium'
+run_args=()
+
+if [ -n "${CONTAINER_RUN_ARGS:-}" ]; then
+  read -r -a run_args <<< "$CONTAINER_RUN_ARGS"
+fi
 
 health_status() {
   curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4096/global/health
@@ -19,6 +24,7 @@ cleanup() {
 trap cleanup EXIT
 
 cid=$("$runtime" run -d \
+  "${run_args[@]}" \
   -p 4096:4096 \
   -e OPENCODE_SERVER_PASSWORD=test \
   -e GH_TOKEN=ghp_example_token \
