@@ -122,6 +122,26 @@
         "type": "github"
       }
     },
+    "opencode": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1775114135,
+        "narHash": "sha256-d4qF6IndWklP193MaC7QQ8u3ATr1eJKKlPFUJSwg0sY=",
+        "owner": "anomalyco",
+        "repo": "opencode",
+        "rev": "db938913736600ce3ad68d89a9a3532c4cd517f5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anomalyco",
+        "repo": "opencode",
+        "type": "github"
+      }
+    },
     "opencode-config": {
       "inputs": {
         "homeManager": "homeManager",
@@ -147,6 +167,7 @@
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable",
+        "opencode": "opencode",
         "opencode-config": "opencode-config"
       }
     },

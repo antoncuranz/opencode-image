@@ -9,15 +9,18 @@
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    opencode = {
+      url = "github:anomalyco/opencode";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     opencode-config.url = "github:antoncuranz/opencode-config";
   };
 
-  outputs = inputs@{ nixpkgs, nixpkgs-unstable, flake-utils, ... }:
+  outputs = inputs@{ nixpkgs, flake-utils, opencode, ... }:
     flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" ] (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        unstablePkgs = import nixpkgs-unstable { inherit system; };
-        opencodePkg = unstablePkgs.opencode;
+        opencodePkg = opencode.packages.${system}.default;
         entrypoint = pkgs.writeShellApplication {
           name = "opencode-entrypoint";
           runtimeInputs = with pkgs; [ coreutils opencodePkg ];
