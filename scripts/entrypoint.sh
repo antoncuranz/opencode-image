@@ -8,4 +8,4 @@ mkdir -p /workspace "$HOME"
 
 cd /workspace
 
-exec opencode web --hostname 0.0.0.0 --port "${PORT}"
+exec opencode web --hostname 0.0.0.0 --port "${PORT}" --print-logs --log-level DEBUG
