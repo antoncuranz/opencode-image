@@ -4,7 +4,7 @@ set -euo pipefail
 runtime="${CONTAINER_CLI:-docker}"
 image="${1:?image required}"
 cid=""
-tools='opencode git gh rg node npm bun python3 go kubectl helm flux talosctl op yq make psql pg_dump vim nix chromium clear which'
+tools='opencode git gh rg node npm bun python3 go kubectl helm flux talosctl op yq make psql pg_dump vim nix chromium clear which tar wget unzip ping'
 
 health_status() {
   curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4096/global/health

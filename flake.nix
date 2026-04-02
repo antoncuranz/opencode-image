@@ -71,9 +71,11 @@
             git
             gh
             gnugrep
+            gnutar
             gnumake
             go
             helm
+            iputils
             jq
             kubectl
             less
@@ -89,7 +91,9 @@
             ripgrep
             talosctl
             bun
+            unzip
             vim
+            wget
             which
             yq
             opencodePkg
