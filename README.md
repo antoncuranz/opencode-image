@@ -40,7 +40,7 @@ Runtime contract:
 - workdir: `/workspace`
 - home: `/home/opencode`
 - `opencode`: `nixpkgs-unstable`
-- entrypoint: `opencode web --hostname 0.0.0.0 --port ${PORT:-4096}`
+- entrypoint: `opencode web --hostname 0.0.0.0 --port ${PORT:-4096} --print-logs --log-level DEBUG`
 - auth: GitHub HTTPS via `gh` credential helper only
 - SSH-based Git auth is not configured or supported
 - CA bundle is exposed at `/etc/ssl/certs/ca-bundle.crt`
