@@ -18,6 +18,7 @@ Use the override locally to reuse the checked-out `opencode-config` repo. CI kee
 docker load < result
 docker tag opencode-image:latest localhost/opencode-image:dev
 docker run --rm \
+  --privileged \
   -p 4096:4096 \
   -e OPENCODE_SERVER_PASSWORD=change-me \
   -e GH_TOKEN=ghp_example_token \
@@ -28,10 +29,6 @@ docker run --rm \
 Required mounts:
 
 - `/workspace` for working repos
-
-Optional mounts:
-
-- `/var/run/docker.sock:/var/run/docker.sock` if you want `docker`, Testcontainers, or image builds from inside the container
 
 Required env:
 
@@ -48,6 +45,10 @@ Runtime contract:
 - auth: GitHub HTTPS via `gh` credential helper only
 - SSH tooling is intentionally not included
 - CA bundle is exposed at `/etc/ssl/certs/ca-bundle.crt`
+- `/usr/bin/env` is available for shebang compatibility
+- `pg_config` is available for Python packages like `psycopg2`
+- Docker commands talk to an internal rootless daemon, not a host socket
+- container runtime should grant `--privileged` or equivalent support for nested containers
 
 Included tooling baseline:
 
@@ -80,7 +81,9 @@ Published tags:
 
 ## Troubleshooting
 
-- If `docker` is installed but cannot reach the daemon, mount the host Docker socket or use a remote daemon.
+- If `docker` is installed but cannot reach the daemon, verify the container is running with `--privileged` or equivalent nested-container support.
+- If `psycopg2` fails to build, verify `pg_config` is present with `command -v pg_config`.
+- If a script fails on `#!/usr/bin/env ...`, verify `/usr/bin/env` exists in the container.
 - If browser automation fails, verify `chromium` starts inside the container and that your OpenCode browser tooling is configured to use it.
 - If GitHub auth fails, verify `GH_TOKEN` is present and `git config --global --get credential.helper` contains `gh auth git-credential`.
 - If the web UI is reachable but login fails, verify `OPENCODE_SERVER_PASSWORD` matches the credentials used by the client.
