@@ -43,7 +43,7 @@ Runtime contract:
 - `opencode`: `nixpkgs-unstable`
 - entrypoint: `opencode web --hostname 0.0.0.0 --port ${PORT:-4096}`
 - auth: GitHub HTTPS via `gh` credential helper only
-- SSH tooling is intentionally not included
+- SSH-based Git auth is not configured or supported
 - CA bundle is exposed at `/etc/ssl/certs/ca-bundle.crt`
 - `/usr/bin/env` is available for shebang compatibility
 - `pg_config` is available for Python packages like `psycopg2`
@@ -61,7 +61,7 @@ Included tooling baseline:
 
 Config is baked in through `opencode-config` and discovered from `~/.config/opencode`. `OPENCODE_CONFIG_DIR` does not need to be set.
 
-The image stays HTTPS-only for Git auth. SSH-based flows, including `cloudlab` bootstrap paths that expect SSH remotes, remain out of scope for this image.
+The image stays HTTPS-only for Git auth. SSH-based flows, including `cloudlab` bootstrap paths that expect SSH remotes, remain out of scope for this image even if some transitive package ships an `ssh` binary.
 
 ## Smoke test
 

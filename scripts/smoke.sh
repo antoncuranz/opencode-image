@@ -46,7 +46,6 @@ test "$("$runtime" inspect --format '{{.Config.WorkingDir}}' "$cid")" = "/worksp
 "$runtime" exec "$cid" sh -lc 'chromium --version >/dev/null'
 "$runtime" exec "$cid" sh -lc 'docker info >/dev/null'
 "$runtime" exec "$cid" sh -lc 'tmpdir=$(mktemp -d) && trap "rm -rf \"$tmpdir\"" EXIT && printf "FROM scratch\nLABEL smoke=1\n" > "$tmpdir/Dockerfile" && docker build -t opencode-smoke "$tmpdir" >/dev/null && docker image inspect opencode-smoke >/dev/null'
-"$runtime" exec "$cid" sh -lc '! command -v ssh >/dev/null 2>&1'
 "$runtime" exec "$cid" sh -lc 'git config --global --get credential.helper | grep "gh auth git-credential"'
 "$runtime" exec "$cid" sh -lc 'test "$(gh config get git_protocol)" = "https"'
 "$runtime" exec "$cid" sh -lc 'curl -fsS https://github.com >/dev/null'
