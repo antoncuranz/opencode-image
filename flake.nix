@@ -25,9 +25,6 @@
         };
         pkgs = import nixpkgs nixpkgsConfig;
         opencodePkg = opencode.packages.${system}.default;
-        bunPkg = pkgs.bun;
-        goPkg = pkgs.go;
-        pythonPkg = pkgs.python312.withPackages (ps: with ps; [ pip rich ]);
         entrypoint = pkgs.writeShellApplication {
           name = "opencode-entrypoint";
           runtimeInputs = with pkgs; [ coreutils opencodePkg ];
@@ -64,7 +61,7 @@
             gh
             gnugrep
             gnumake
-            goPkg
+            go
             helm
             jq
             kubectl
@@ -75,10 +72,10 @@
             _1password-cli
             procps
             postgresql
-            pythonPkg
+            (python312.withPackages (ps: with ps; [ pip rich ]))
             ripgrep
             talosctl
-            bunPkg
+            bun
             vim
             yq
             opencodePkg
