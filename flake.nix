@@ -9,10 +9,14 @@
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    opencode = {
+      url = "github:anomalyco/opencode";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     opencode-config.url = "github:antoncuranz/opencode-config";
   };
 
-  outputs = inputs@{ nixpkgs, nixpkgs-unstable, flake-utils, ... }:
+  outputs = inputs@{ nixpkgs, nixpkgs-unstable, flake-utils, opencode, ... }:
     flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" ] (system:
       let
         nixpkgsConfig = {
@@ -20,12 +24,18 @@
           config.allowUnfreePredicate = pkg:
             builtins.elem (nixpkgs.lib.getName pkg) [ "1password-cli" ];
         };
-        pkgs = import nixpkgs nixpkgsConfig;
         unstablePkgs = import nixpkgs-unstable nixpkgsConfig;
-        opencodePkg = unstablePkgs.opencode;
-        bunPkg = unstablePkgs.bun;
-        goPkg = unstablePkgs.go;
-        pythonPkg = pkgs.python312.withPackages (ps: with ps; [ pip rich ]);
+        pkgs = import nixpkgs {
+          inherit system;
+          config = nixpkgsConfig.config;
+          overlays = [
+            (final: _prev: {
+              bun = unstablePkgs.bun;
+            })
+            opencode.overlays.default
+          ];
+        };
+        opencodePkg = pkgs.opencode;
         entrypoint = pkgs.writeShellApplication {
           name = "opencode-entrypoint";
           runtimeInputs = with pkgs; [ coreutils opencodePkg ];
@@ -62,7 +72,7 @@
             gh
             gnugrep
             gnumake
-            goPkg
+            go
             helm
             jq
             kubectl
@@ -73,10 +83,10 @@
             _1password-cli
             procps
             postgresql
-            pythonPkg
+            (python312.withPackages (ps: with ps; [ pip rich ]))
             ripgrep
             talosctl
-            bunPkg
+            bun
             vim
             yq
             opencodePkg
