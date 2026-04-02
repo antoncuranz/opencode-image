@@ -92,9 +92,9 @@
             nodejs_24
             noto-fonts
             _1password-cli
+            libpq.pg_config
             procps
             postgresql
-            postgresql.dev
             (python312.withPackages (ps: with ps; [ pip rich ]))
             ripgrep
             runc
