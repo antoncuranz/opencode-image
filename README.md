@@ -54,7 +54,7 @@ Included tooling baseline:
 - Python: `python3`, `pip`
 - Go: `go`
 - Kubernetes/GitOps: `kubectl`, `helm`, `flux`, `talosctl`, `op`, `yq`
-- Dev tooling: `make`, `psql`, `pg_dump`, `vim`, `nix`, `clear`, `which`
+- Dev tooling: `make`, `psql`, `pg_dump`, `vim`, `nix`, `clear`, `which`, `tar`, `wget`, `unzip`, `ping`
 - Browser automation baseline: `chromium` for `agent-browser` and similar tooling
 
 Config is baked in through `opencode-config` and discovered from `~/.config/opencode`. `OPENCODE_CONFIG_DIR` does not need to be set.
@@ -80,6 +80,7 @@ Published tags:
 ## Troubleshooting
 
 - If `psycopg2` fails to build, verify `pg_config` is present with `command -v pg_config`.
+- If `ping` is present but cannot send packets, verify the container runtime grants the privileges your environment needs for ICMP.
 - If a script fails on `#!/usr/bin/env ...`, verify `/usr/bin/env` exists in the container.
 - If browser automation fails, verify the `chromium` wrapper exists in the container and that your OpenCode browser tooling passes the flags your runtime needs.
 - If GitHub auth fails, verify `GH_TOKEN` is present and `git config --global --get credential.helper` contains `gh auth git-credential`.
