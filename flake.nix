@@ -24,9 +24,18 @@
           config.allowUnfreePredicate = pkg:
             builtins.elem (nixpkgs.lib.getName pkg) [ "1password-cli" ];
         };
-        pkgs = import nixpkgs nixpkgsConfig;
         unstablePkgs = import nixpkgs-unstable nixpkgsConfig;
-        opencodePkg = opencode.packages.${system}.default;
+        pkgs = import nixpkgs {
+          inherit system;
+          config = nixpkgsConfig.config;
+          overlays = [
+            (final: _prev: {
+              bun = unstablePkgs.bun;
+            })
+            opencode.overlays.default
+          ];
+        };
+        opencodePkg = pkgs.opencode;
         entrypoint = pkgs.writeShellApplication {
           name = "opencode-entrypoint";
           runtimeInputs = with pkgs; [ coreutils opencodePkg ];
@@ -77,7 +86,7 @@
             (python312.withPackages (ps: with ps; [ pip rich ]))
             ripgrep
             talosctl
-            unstablePkgs.bun
+            bun
             vim
             yq
             opencodePkg
