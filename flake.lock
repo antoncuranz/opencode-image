@@ -148,11 +148,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1775115933,
-        "narHash": "sha256-Q6haoKQA64/3pjFbNWaJBvQg+nAVE0j8fGefex3TkOY=",
+        "lastModified": 1775206535,
+        "narHash": "sha256-Vp8SUbvfqCFbUUrtMypzPdmZhaGuCQ4fBY89TztW9OA=",
         "owner": "antoncuranz",
         "repo": "opencode-config",
-        "rev": "b3189ed1a18249cea974cdf108ce262ce1001528",
+        "rev": "66bda9c85faba42d851814e0d884dd5a88256ebf",
         "type": "github"
       },
       "original": {
